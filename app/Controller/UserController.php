@@ -37,7 +37,7 @@ class UserController
 
         try {
             $this->userService->register($request);
-            View::redirect('users/login');
+            View::redirect('/users/login');
         } catch (ValidationException $exception) {
             View::render('User/register', [
                 'title' => 'Register new User',
