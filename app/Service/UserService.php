@@ -5,6 +5,8 @@ namespace KrisnaBeaute\BelajarPhpMvc\Service;
 use KrisnaBeaute\BelajarPhpMvc\Config\Database;
 use KrisnaBeaute\BelajarPhpMvc\Domain\User;
 use KrisnaBeaute\BelajarPhpMvc\Exception\ValidationException;
+use KrisnaBeaute\BelajarPhpMvc\Model\UserLoginRequest;
+use KrisnaBeaute\BelajarPhpMvc\Model\UserLoginResponse;
 use KrisnaBeaute\BelajarPhpMvc\Model\UserRegisterRequest;
 use KrisnaBeaute\BelajarPhpMvc\Model\UserRegisterResponse;
 use KrisnaBeaute\BelajarPhpMvc\Repository\UserRepository;
@@ -51,6 +53,32 @@ class UserService
         if ($request->id == null || $request->name == null || $request->password == null ||
             trim($request->id) == "" || trim($request->name) == "" || trim($request->password) == "") {
             throw new ValidationException("Id, Name, Password can not blank");
+        }
+    }
+
+    public function login(UserLoginRequest $request): UserLoginResponse
+    {
+        $this->validateUserRegistrationRequest($request);
+
+        $user = $this->userRepository->findById($request->id);
+        if ($user == null) {
+            throw new ValidationException("Id or password is wrong");
+        }
+
+        if (password_verify($request->password, $user->password)) {
+            $response = new UserLoginResponse();
+            $response->user = $user;
+            return $response;
+        } else {
+            throw new ValidationException("Id or password is wrong");
+        }
+    }
+
+    public function validationUserLoginRequest(UserLoginRequest $request)
+    {
+        if ($request->id == null || $request->password == null ||
+            trim($request->id) == "" || trim($request->password) == "") {
+            throw new ValidationException("Id, Password can not blank");
         }
     }
 }
