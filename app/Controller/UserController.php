@@ -5,6 +5,7 @@ namespace KrisnaBeaute\BelajarPhpMvc\Controller;
 use KrisnaBeaute\BelajarPhpMvc\App\View;
 use KrisnaBeaute\BelajarPhpMvc\Config\Database;
 use KrisnaBeaute\BelajarPhpMvc\Exception\ValidationException;
+use KrisnaBeaute\BelajarPhpMvc\Model\UserLoginRequest;
 use KrisnaBeaute\BelajarPhpMvc\Model\UserRegisterRequest;
 use KrisnaBeaute\BelajarPhpMvc\Repository\UserRepository;
 use KrisnaBeaute\BelajarPhpMvc\Service\UserService;
@@ -42,6 +43,30 @@ class UserController
             View::render('User/register', [
                 'title' => 'Register new User',
                 'error' => $exception->getMessage()
+            ]);
+        }
+    }
+
+    public function login()
+    {
+        View::render("User/login", [
+            "title" => "Login user"
+        ]);
+    }
+
+    public function postLogin()
+    {
+        $request = new UserLoginRequest();
+        $request->id = $_POST['id'];
+        $request->password = $_POST['password'];
+
+        try {
+            $this->userService->login($request);
+            View::redirect('/');
+        } catch (ValidationException $exception) {
+            View::render("User/login", [
+                "title" => "Login user",
+                "error" => $exception->getMessage()
             ]);
         }
     }
