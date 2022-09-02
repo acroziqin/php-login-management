@@ -58,7 +58,7 @@ class UserService
 
     public function login(UserLoginRequest $request): UserLoginResponse
     {
-        $this->validateUserRegistrationRequest($request);
+        $this->validationUserLoginRequest($request);
 
         $user = $this->userRepository->findById($request->id);
         if ($user == null) {

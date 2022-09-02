@@ -5,6 +5,7 @@ namespace KrisnaBeaute\BelajarPhpMvc\Service;
 use KrisnaBeaute\BelajarPhpMvc\Config\Database;
 use KrisnaBeaute\BelajarPhpMvc\Domain\User;
 use KrisnaBeaute\BelajarPhpMvc\Exception\ValidationException;
+use KrisnaBeaute\BelajarPhpMvc\Model\UserLoginRequest;
 use KrisnaBeaute\BelajarPhpMvc\Model\UserRegisterRequest;
 use KrisnaBeaute\BelajarPhpMvc\Repository\UserRepository;
 use PHPUnit\Framework\TestCase;
@@ -68,5 +69,51 @@ class UserServiceTest extends TestCase
         $request->password = "rahasia";
 
         $this->userService->register($request);
+    }
+
+    public function testLoginNotFound()
+    {
+        $this->expectException(ValidationException::class);
+
+        $request = new UserLoginRequest();
+        $request->id = "roziqin";
+        $request->password = "roziqin";
+
+        $this->userService->login($request);
+    }
+
+    public function testLoginWrongPassword()
+    {
+        $user = new User();
+        $user->id = "roziqin";
+        $user->name = "Roziqin";
+        $user->password = password_hash("rahasia", PASSWORD_BCRYPT);
+
+        $this->expectException(ValidationException::class);
+
+        $request = new UserLoginRequest();
+        $request->id = "roziqin";
+        $request->password = "salah";
+
+        $this->userService->login($request);
+    }
+
+    public function testLoginSuccess()
+    {
+        $user = new User();
+        $user->id = "roziqin";
+        $user->name = "Roziqin";
+        $user->password = password_hash("rahasia", PASSWORD_BCRYPT);
+
+        $this->expectException(ValidationException::class);
+
+        $request = new UserLoginRequest();
+        $request->id = "roziqin";
+        $request->password = "rahasia";
+
+        $response = $this->userService->login($request);
+
+        self::assertEquals($request->id, $response->user->id);
+        self::assertTrue(password_verify($request->password, $response->user->password));
     }
 }
