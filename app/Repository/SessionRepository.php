@@ -17,7 +17,7 @@ class SessionRepository
     {
         $statement = $this->connection->prepare("INSERT INTO sessions(id, user_id) VALUES (?, ?)");
         $statement->execute([$session->id, $session->userId]);
-        return $statement;
+        return $session;
     }
 
     public function findById(string $id): ?Session
@@ -39,7 +39,7 @@ class SessionRepository
         }
     }
 
-    public function delete(string $id): void
+    public function deleteById(string $id): void
     {
         $statement = $this->connection->prepare("DELETE FROM sessions WHERE id = ?");
         $statement->execute([$id]);
