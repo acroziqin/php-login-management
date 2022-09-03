@@ -2,7 +2,8 @@
 
 namespace KrisnaBeaute\BelajarPhpMvc\App {
 
-    function header(string $value) {
+    function header(string $value)
+    {
         echo $value;
     }
 }
@@ -88,6 +89,78 @@ namespace KrisnaBeaute\BelajarPhpMvc\Controller {
             $this->expectOutputRegex('[Password]');
             $this->expectOutputRegex('[Register new User]');
             $this->expectOutputRegex('[User Id already exists]');
+        }
+
+        public function testLogin()
+        {
+            $this->userController->login();
+
+            $this->expectOutputRegex('[Login user]');
+            $this->expectOutputRegex('[Id]');
+            $this->expectOutputRegex('[Password]');
+        }
+
+        public function testLoginSuccess()
+        {
+            $user = new User();
+            $user->id = 'roziqin';
+            $user->name = 'Roziqin';
+            $user->password = password_hash('rahasia', PASSWORD_BCRYPT);
+
+            $this->userRepository->save($user);
+
+            $_POST['id'] = 'roziqin';
+            $_POST['password'] = 'rahasia';
+
+            $this->userController->postLogin();
+
+            $this->expectOutputRegex('[Location: /]');
+        }
+
+        public function testLoginValidationError()
+        {
+            $_POST['id'] = '';
+            $_POST['password'] = '';
+
+            $this->userController->postLogin();
+
+            $this->expectOutputRegex('[Login user]');
+            $this->expectOutputRegex('[Id]');
+            $this->expectOutputRegex('[Password]');
+            $this->expectOutputRegex('[Id, Password can not blank]');
+        }
+
+        public function testLoginUserNotFound()
+        {
+            $_POST['id'] = 'notfound';
+            $_POST['password'] = 'notfound';
+
+            $this->userController->postLogin();
+
+            $this->expectOutputRegex('[Login user]');
+            $this->expectOutputRegex('[Id]');
+            $this->expectOutputRegex('[Password]');
+            $this->expectOutputRegex('[Id or password is wrong]');
+        }
+
+        public function testLoginWrongPassword()
+        {
+            $user = new User();
+            $user->id = 'roziqin';
+            $user->name = 'Roziqin';
+            $user->password = password_hash('rahasia', PASSWORD_BCRYPT);
+
+            $this->userRepository->save($user);
+
+            $_POST['id'] = 'roziqin';
+            $_POST['password'] = 'salah';
+
+            $this->userController->postLogin();
+
+            $this->expectOutputRegex('[Login user]');
+            $this->expectOutputRegex('[Id]');
+            $this->expectOutputRegex('[Password]');
+            $this->expectOutputRegex('[Id or password is wrong]');
         }
     }
 }
