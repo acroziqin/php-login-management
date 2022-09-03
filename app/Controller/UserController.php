@@ -7,18 +7,24 @@ use KrisnaBeaute\BelajarPhpMvc\Config\Database;
 use KrisnaBeaute\BelajarPhpMvc\Exception\ValidationException;
 use KrisnaBeaute\BelajarPhpMvc\Model\UserLoginRequest;
 use KrisnaBeaute\BelajarPhpMvc\Model\UserRegisterRequest;
+use KrisnaBeaute\BelajarPhpMvc\Repository\SessionRepository;
 use KrisnaBeaute\BelajarPhpMvc\Repository\UserRepository;
+use KrisnaBeaute\BelajarPhpMvc\Service\SessionService;
 use KrisnaBeaute\BelajarPhpMvc\Service\UserService;
 
 class UserController
 {
     private UserService $userService;
+    private SessionService $sessionService;
 
     public function __construct()
     {
         $connection = Database::getConnection();
         $userRepository = new UserRepository($connection);
         $this->userService = new UserService($userRepository);
+
+        $sessionRepository = new SessionRepository($connection);
+        $this->sessionService = new SessionService($sessionRepository, $userRepository);
     }
 
 
@@ -61,7 +67,10 @@ class UserController
         $request->password = $_POST['password'];
 
         try {
-            $this->userService->login($request);
+            $response = $this->userService->login($request);
+
+            $this->sessionService->create($response->user->id);
+
             View::redirect('/');
         } catch (ValidationException $exception) {
             View::render("User/login", [
