@@ -2,8 +2,8 @@
 
 namespace KrisnaBeaute\BelajarPhpMvc\Service;
 
-use http\Client\Curl\User;
 use KrisnaBeaute\BelajarPhpMvc\Domain\Session;
+use KrisnaBeaute\BelajarPhpMvc\Domain\User;
 use KrisnaBeaute\BelajarPhpMvc\Repository\SessionRepository;
 use KrisnaBeaute\BelajarPhpMvc\Repository\UserRepository;
 
