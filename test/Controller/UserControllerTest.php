@@ -8,10 +8,19 @@ namespace KrisnaBeaute\BelajarPhpMvc\App {
     }
 }
 
+namespace KrisnaBeaute\BelajarPhpMvc\Service {
+
+    function setcookie(string $name, string $value)
+    {
+        echo "$name: $value";
+    }
+}
+
 namespace KrisnaBeaute\BelajarPhpMvc\Controller {
 
     use KrisnaBeaute\BelajarPhpMvc\Config\Database;
     use KrisnaBeaute\BelajarPhpMvc\Domain\User;
+    use KrisnaBeaute\BelajarPhpMvc\Repository\SessionRepository;
     use KrisnaBeaute\BelajarPhpMvc\Repository\UserRepository;
     use PHPUnit\Framework\TestCase;
 
@@ -19,10 +28,14 @@ namespace KrisnaBeaute\BelajarPhpMvc\Controller {
     {
         private UserController $userController;
         private UserRepository $userRepository;
+        private SessionRepository $sessionRepository;
 
         protected function setUp(): void
         {
             $this->userController = new UserController();
+
+            $this->sessionRepository = new SessionRepository(Database::getConnection());
+            $this->sessionRepository->deleteAll();
 
             $this->userRepository = new UserRepository(Database::getConnection());
             $this->userRepository->deleteAll();
@@ -115,6 +128,7 @@ namespace KrisnaBeaute\BelajarPhpMvc\Controller {
             $this->userController->postLogin();
 
             $this->expectOutputRegex('[Location: /]');
+            $this->expectOutputRegex('[X-KRB-SESSION: ]');
         }
 
         public function testLoginValidationError()
