@@ -19,9 +19,11 @@ namespace KrisnaBeaute\BelajarPhpMvc\Service {
 namespace KrisnaBeaute\BelajarPhpMvc\Controller {
 
     use KrisnaBeaute\BelajarPhpMvc\Config\Database;
+    use KrisnaBeaute\BelajarPhpMvc\Domain\Session;
     use KrisnaBeaute\BelajarPhpMvc\Domain\User;
     use KrisnaBeaute\BelajarPhpMvc\Repository\SessionRepository;
     use KrisnaBeaute\BelajarPhpMvc\Repository\UserRepository;
+    use KrisnaBeaute\BelajarPhpMvc\Service\SessionService;
     use PHPUnit\Framework\TestCase;
 
     class UserControllerTest extends TestCase
@@ -175,6 +177,28 @@ namespace KrisnaBeaute\BelajarPhpMvc\Controller {
             $this->expectOutputRegex('[Id]');
             $this->expectOutputRegex('[Password]');
             $this->expectOutputRegex('[Id or password is wrong]');
+        }
+
+        public function testLogout()
+        {
+            $user = new User();
+            $user->id = 'roziqin';
+            $user->name = 'Roziqin';
+            $user->password = password_hash('rahasia', PASSWORD_BCRYPT);
+
+            $this->userRepository->save($user);
+
+            $session = new Session();
+            $session->id = uniqid();
+            $session->userId = $user->id;
+            $this->sessionRepository->save($session);
+
+            $_COOKIE[SessionService::$COOKIE_NAME] = $session->id;
+
+            $this->userController->logout();
+
+            $this->expectOutputRegex("[Location: /]");
+            $this->expectOutputRegex("[X-KRB-SESSION: ]");
         }
     }
 }
