@@ -7,6 +7,8 @@ use KrisnaBeaute\BelajarPhpMvc\Domain\User;
 use KrisnaBeaute\BelajarPhpMvc\Exception\ValidationException;
 use KrisnaBeaute\BelajarPhpMvc\Model\UserLoginRequest;
 use KrisnaBeaute\BelajarPhpMvc\Model\UserLoginResponse;
+use KrisnaBeaute\BelajarPhpMvc\Model\UserProfileUpdateRequest;
+use KrisnaBeaute\BelajarPhpMvc\Model\UserProfileUpdateResponse;
 use KrisnaBeaute\BelajarPhpMvc\Model\UserRegisterRequest;
 use KrisnaBeaute\BelajarPhpMvc\Model\UserRegisterResponse;
 use KrisnaBeaute\BelajarPhpMvc\Repository\UserRepository;
@@ -56,7 +58,7 @@ class UserService
         }
     }
 
-    public function login(UserLoginRequest $request): UserLoginResponse
+    private function login(UserLoginRequest $request): UserLoginResponse
     {
         $this->validationUserLoginRequest($request);
 
@@ -74,10 +76,44 @@ class UserService
         }
     }
 
-    public function validationUserLoginRequest(UserLoginRequest $request)
+    private function validationUserLoginRequest(UserLoginRequest $request)
     {
         if ($request->id == null || $request->password == null ||
             trim($request->id) == "" || trim($request->password) == "") {
+            throw new ValidationException("Id, Password can not blank");
+        }
+    }
+
+    private function updateProfile(UserProfileUpdateRequest $request): UserProfileUpdateResponse
+    {
+        $this->validationUserProfileUpdateRequest($request);
+
+        try {
+            Database::beginTransaction();
+
+            $user = $this->userRepository->findById($request->id);
+            if ($user == null) {
+                throw new ValidationException("User is not found");
+            }
+
+            $user->name = $request->name;
+            $this->userRepository->save($user);
+
+            Database::commitTransaction();
+
+            $response = new UserProfileUpdateResponse();
+            $response->user = $user;
+            return $response;
+        } catch (\Exception $exception) {
+            Database::rollbackTransaction();
+            throw $exception;
+        }
+    }
+
+    private function validationUserProfileUpdateRequest(UserProfileUpdateRequest $request):
+    {
+        if ($request->id == null || $request->name == null ||
+            trim($request->id) == "" || trim($request->name) == "") {
             throw new ValidationException("Id, Password can not blank");
         }
     }
