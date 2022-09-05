@@ -6,6 +6,7 @@ use KrisnaBeaute\BelajarPhpMvc\Config\Database;
 use KrisnaBeaute\BelajarPhpMvc\Domain\User;
 use KrisnaBeaute\BelajarPhpMvc\Exception\ValidationException;
 use KrisnaBeaute\BelajarPhpMvc\Model\UserLoginRequest;
+use KrisnaBeaute\BelajarPhpMvc\Model\UserProfileUpdateRequest;
 use KrisnaBeaute\BelajarPhpMvc\Model\UserRegisterRequest;
 use KrisnaBeaute\BelajarPhpMvc\Repository\UserRepository;
 use PHPUnit\Framework\TestCase;
@@ -115,5 +116,46 @@ class UserServiceTest extends TestCase
 
         self::assertEquals($request->id, $response->user->id);
         self::assertTrue(password_verify($request->password, $response->user->password));
+    }
+
+    public function testUpdateSuccess()
+    {
+        $user = new User();
+        $user->id = "roziqin";
+        $user->name = "Roziqin";
+        $user->password = password_hash("rahasia", PASSWORD_BCRYPT);
+        $this->userRepository->save($user);
+
+        $request = new UserProfileUpdateRequest();
+        $request->id = "roziqin";
+        $request->name = "Budi";
+
+        $this->userService->updateProfile($request);
+
+        $result = $this->userRepository->findById($user->id);
+
+        self::assertEquals($request->name, $result->name);
+    }
+
+    public function testUpdateValidationError()
+    {
+        $this->expectException(ValidationException::class);
+
+        $request = new UserProfileUpdateRequest();
+        $request->id = "";
+        $request->name = "";
+
+        $this->userService->updateProfile($request);
+    }
+
+    public function testUpdateNotFound()
+    {
+        $this->expectException(ValidationException::class);
+
+        $request = new UserProfileUpdateRequest();
+        $request->id = "roziqin";
+        $request->name = "Roziqin";
+
+        $this->userService->updateProfile($request);
     }
 }

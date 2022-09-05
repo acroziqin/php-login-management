@@ -58,7 +58,7 @@ class UserService
         }
     }
 
-    private function login(UserLoginRequest $request): UserLoginResponse
+    public function login(UserLoginRequest $request): UserLoginResponse
     {
         $this->validationUserLoginRequest($request);
 
@@ -84,7 +84,7 @@ class UserService
         }
     }
 
-    private function updateProfile(UserProfileUpdateRequest $request): UserProfileUpdateResponse
+    public function updateProfile(UserProfileUpdateRequest $request): UserProfileUpdateResponse
     {
         $this->validationUserProfileUpdateRequest($request);
 
@@ -97,7 +97,7 @@ class UserService
             }
 
             $user->name = $request->name;
-            $this->userRepository->save($user);
+            $this->userRepository->update($user);
 
             Database::commitTransaction();
 
@@ -110,7 +110,7 @@ class UserService
         }
     }
 
-    private function validationUserProfileUpdateRequest(UserProfileUpdateRequest $request):
+    private function validationUserProfileUpdateRequest(UserProfileUpdateRequest $request)
     {
         if ($request->id == null || $request->name == null ||
             trim($request->id) == "" || trim($request->name) == "") {
