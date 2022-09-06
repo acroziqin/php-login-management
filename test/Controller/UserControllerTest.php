@@ -251,7 +251,7 @@ namespace KrisnaBeaute\BelajarPhpMvc\Controller {
             self::assertEquals($_POST['name'], $result->name);
         }
 
-        public function testPostUpdaeProfileValidationError()
+        public function testPostUpdateProfileValidationError()
         {
             $user = new User();
             $user->id = 'roziqin';
@@ -275,6 +275,111 @@ namespace KrisnaBeaute\BelajarPhpMvc\Controller {
             $this->expectOutputRegex("[$user->id]");
             $this->expectOutputRegex("[Name]");
             $this->expectOutputRegex("[Name can not blank]");
+        }
+
+        public function testUpdatePassword()
+        {
+            $user = new User();
+            $user->id = 'roziqin';
+            $user->name = 'Roziqin';
+            $user->password = password_hash('rahasia', PASSWORD_BCRYPT);
+
+            $this->userRepository->save($user);
+
+            $session = new Session();
+            $session->id = uniqid();
+            $session->userId = $user->id;
+            $this->sessionRepository->save($session);
+
+            $_COOKIE[SessionService::$COOKIE_NAME] = $session->id;
+
+            $this->userController->updatePassword();
+
+            $this->expectOutputRegex("[Password]");
+            $this->expectOutputRegex("[Id]");
+            $this->expectOutputRegex("[$user->id]");
+        }
+
+        public function testPostUpdatePasswordSuccess()
+        {
+            $user = new User();
+            $user->id = 'roziqin';
+            $user->name = 'Roziqin';
+            $user->password = password_hash('rahasia', PASSWORD_BCRYPT);
+
+            $this->userRepository->save($user);
+
+            $session = new Session();
+            $session->id = uniqid();
+            $session->userId = $user->id;
+            $this->sessionRepository->save($session);
+
+            $_COOKIE[SessionService::$COOKIE_NAME] = $session->id;
+
+            $_POST['oldPassword'] = 'rahasia';
+            $_POST['newPassword'] = 'budi';
+
+            $this->userController->postUpdatePassword();
+
+            $this->expectOutputRegex("[Location: /]");
+
+            $result = $this->userRepository->findById($user->id);
+
+            self::assertTrue(password_verify($_POST['newPassword'], $result->password));
+        }
+
+        public function testPostUpdateValidationError()
+        {
+            $user = new User();
+            $user->id = 'roziqin';
+            $user->name = 'Roziqin';
+            $user->password = password_hash('rahasia', PASSWORD_BCRYPT);
+
+            $this->userRepository->save($user);
+
+            $session = new Session();
+            $session->id = uniqid();
+            $session->userId = $user->id;
+            $this->sessionRepository->save($session);
+
+            $_COOKIE[SessionService::$COOKIE_NAME] = $session->id;
+
+            $_POST['oldPassword'] = '';
+            $_POST['newPassword'] = '';
+
+            $this->userController->postUpdatePassword();
+
+            $this->expectOutputRegex("[Password]");
+            $this->expectOutputRegex("[Id]");
+            $this->expectOutputRegex("[$user->id]");
+            $this->expectOutputRegex("[Old Password or New Password can not blank]");
+        }
+
+        public function testPostUpdateWrongOldPassword()
+        {
+            $user = new User();
+            $user->id = 'roziqin';
+            $user->name = 'Roziqin';
+            $user->password = password_hash('rahasia', PASSWORD_BCRYPT);
+
+            $this->userRepository->save($user);
+
+            $session = new Session();
+            $session->id = uniqid();
+            $session->userId = $user->id;
+            $this->sessionRepository->save($session);
+
+            $_COOKIE[SessionService::$COOKIE_NAME] = $session->id;
+
+            $_POST['oldPassword'] = 'salah';
+            $_POST['newPassword'] = 'budi';
+
+            $this->userController->postUpdatePassword();
+
+            $this->expectOutputRegex("[Password]");
+            $this->expectOutputRegex("[Id]");
+            $this->expectOutputRegex("[$user->id]");
+            $this->expectOutputRegex("[Old Password id wrong]");
         }
     }
 }
