@@ -2,17 +2,14 @@
 
 namespace KrisnaBeaute\BelajarPhpMvc\Service;
 
+require_once __DIR__ . '/../Helper/helper.php';
+
 use KrisnaBeaute\BelajarPhpMvc\Config\Database;
 use KrisnaBeaute\BelajarPhpMvc\Domain\Session;
 use KrisnaBeaute\BelajarPhpMvc\Domain\User;
 use KrisnaBeaute\BelajarPhpMvc\Repository\SessionRepository;
 use KrisnaBeaute\BelajarPhpMvc\Repository\UserRepository;
 use PHPUnit\Framework\TestCase;
-
-function setcookie(string $name, string $value)
-{
-    echo "$name: $value";
-}
 
 class SessionServiceTest extends TestCase
 {

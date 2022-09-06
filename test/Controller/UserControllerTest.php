@@ -1,22 +1,8 @@
 <?php
 
-namespace KrisnaBeaute\BelajarPhpMvc\App {
-
-    function header(string $value)
-    {
-        echo $value;
-    }
-}
-
-namespace KrisnaBeaute\BelajarPhpMvc\Service {
-
-    function setcookie(string $name, string $value)
-    {
-        echo "$name: $value";
-    }
-}
-
 namespace KrisnaBeaute\BelajarPhpMvc\Controller {
+
+    require_once __DIR__ . '/../Helper/helper.php';
 
     use KrisnaBeaute\BelajarPhpMvc\Config\Database;
     use KrisnaBeaute\BelajarPhpMvc\Domain\Session;
