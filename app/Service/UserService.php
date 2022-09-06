@@ -138,11 +138,11 @@ class UserService
             $user->password = password_hash($request->newPassword, PASSWORD_BCRYPT);
             $this->userRepository->update($user);
 
+            Database::commitTransaction();
+
             $response = new UserPasswordUpdateResponse();
             $response->user = $user;
             return $response;
-
-            Database::commitTransaction();
         } catch (\Exception $exception) {
             Database::rollbackTransaction();
             throw $exception;
