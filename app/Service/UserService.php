@@ -151,9 +151,9 @@ class UserService
 
     private function validateUserPasswordUpdateRequest(UserPasswordUpdateRequest $request)
     {
-        if ($request->id == null || $request->oldPassword == null || $request->newPassword == null ||
-            trim($request->id) == "" || trim($request->oldPassword) == "" || trim($request->newPassword) == "") {
-            throw new ValidationException("Id, Old Password, New Password can not blank");
+        if ($request->oldPassword == null || $request->newPassword == null ||
+            trim($request->oldPassword) == "" || trim($request->newPassword) == "") {
+            throw new ValidationException("Old Password or New Password can not blank");
         }
     }
 }

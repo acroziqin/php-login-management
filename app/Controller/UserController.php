@@ -6,6 +6,7 @@ use KrisnaBeaute\BelajarPhpMvc\App\View;
 use KrisnaBeaute\BelajarPhpMvc\Config\Database;
 use KrisnaBeaute\BelajarPhpMvc\Exception\ValidationException;
 use KrisnaBeaute\BelajarPhpMvc\Model\UserLoginRequest;
+use KrisnaBeaute\BelajarPhpMvc\Model\UserPasswordUpdateRequest;
 use KrisnaBeaute\BelajarPhpMvc\Model\UserProfileUpdateRequest;
 use KrisnaBeaute\BelajarPhpMvc\Model\UserRegisterRequest;
 use KrisnaBeaute\BelajarPhpMvc\Repository\SessionRepository;
@@ -119,6 +120,41 @@ class UserController
                 "user" => [
                     "id" => $user->id,
                     "name" => $_POST['name']
+                ]
+            ]);
+        }
+    }
+
+    public function updatePassword()
+    {
+        $user = $this->sessionService->current();
+
+        View::render('User/password', [
+            "title" => "Update user password",
+            "user" => [
+                "id" => $user->id
+            ]
+        ]);
+    }
+
+    public function postUpdatePassword()
+    {
+        $user = $this->sessionService->current();
+
+        $request = new UserPasswordUpdateRequest();
+        $request->id = $user->id;
+        $request->oldPassword = $_POST['oldPassword'];
+        $request->newPassword = $_POST['newPassword'];
+
+        try {
+            $this->userService->updatePassword($request);
+            View::redirect('/');
+        } catch (ValidationException $exception) {
+            View::render('User/password', [
+                "title" => "Update user password",
+                "error" => $exception->getMessage(),
+                "user" => [
+                    "id" => $user->id
                 ]
             ]);
         }
